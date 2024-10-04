@@ -2,8 +2,18 @@
 #include <string>
 #include <cstring>
 #include <map>
+#include <math.h>
 
-bool ft_check_map(std::map<int, float> numbers)
+bool ft_check_map_equal(std::map<int, float>& numbers)
+{
+	if (numbers.size() == 0)
+		numbers[0] = 0.0;
+	else if (numbers.size() > 1 || numbers.begin()->first != 0)
+		return (false);
+	return (true);
+}
+
+bool ft_check_map_equation(std::map<int, float> numbers)
 {
 	if (numbers.begin()->first != 0)
 		return (false);
@@ -22,8 +32,15 @@ void ft_print_map(std::map<int, float> numbers)
 {
 	for (std::map<int, float>::iterator it = numbers.begin(); it != numbers.end(); it++)
 	{
-		std::cout << "Key: " << it->first << std::endl;
-		std::cout << "Value: " << it->second << std::endl << std::endl;
+		if (it == numbers.begin())
+			std::cout << it->second << " * X^" << it->first << " ";
+		else
+		{
+			if (it->second >= 0)
+				std::cout << "+ " << it->second << " * X^" << it->first << " ";
+			else
+				std::cout << "- " << (it->second  * - 1) << " * X^" << it->first << " ";
+		}
 	}
 }
 
@@ -32,15 +49,23 @@ bool ft_parse(std::map<int, float>& map, std::string str)
 	int i;
 	int j;
 	int index;
+	std::string temp;
 
 	i = 0;
 	index = 0;
-	while (i < str.size() - 1)
+	while (i < (int)str.size() - 1)
 	{
+		if (std::isdigit(str[i]))
+			temp = "";
+		else
+		{
+			temp = str[i];
+			while (str[i] && !std::isdigit(str[i]))
+				i++;
+		}
 		j = 0;
 		while(str[i + j] && (std::isdigit(str[i + j]) || str[i + j] == '.'))
 			j++;
-		std::string temp;
 		temp.append(str, i, j);
 		while (str[i + j] && !std::isdigit(str[i + j]))
 			j++;
@@ -50,7 +75,7 @@ bool ft_parse(std::map<int, float>& map, std::string str)
 		map[index] = std::stof(temp);
 		if (str[i + j + 1])
 			j++;
-		while (str[i + j] && !std::isdigit(str[i + j]))
+		while (str[i + j] && str[i + j] == ' ')
 			j++;
 		i += j;
 	}
@@ -84,6 +109,41 @@ bool ft_create_equation_strings(char *input, std::string& equation, std::string&
 	return (false);
 }
 
+void ft_create_reduced_form(std::map<int, float>& equation_map, std::map<int, float>& equal_map)
+{
+	equation_map.begin()->second += (equal_map.begin()->second * -1);
+	equal_map.begin()->second = 0.0;
+}
+
+void ft_solve_second(std::map<int, float> equation_map)
+{
+	double delta;
+	double solution1;
+	double solution2;
+	float a;
+	float b;
+	float c;
+
+	a = equation_map.at(2);
+	b = equation_map.at(1);
+	c = equation_map.at(0);
+	delta = (b * b) - 4 * a * c;
+	if (delta > 0)
+	{
+		solution1 = ((b * -1) - sqrt(delta)) / (2 * a);
+		solution2 = ((b * -1) + sqrt(delta)) / (2 * a);
+		std::cout << "Solution 1: " << solution1 << std::endl;
+		std::cout << "Solution 2: " << solution2 << std::endl;
+	}
+	else if (delta < 0)
+		std::cout << "No solutions" << std::endl;
+	else
+	{
+		solution1 = (b * -1) / (2 * a);
+		std::cout << "Solution: " << solution1 << std::endl;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	std::map<int, float> equation_map;
@@ -106,14 +166,33 @@ int main(int argc, char **argv)
 		std::cerr << "Error parsing" << std::endl;
 		return (1);
 	}
-	if (ft_check_map(equation_map) == false)
+	if (ft_check_map_equation(equation_map) == false)
 	{
-		std::cerr << "Error exponent" << std::endl;
+		std::cerr << "Error exponent equation" << std::endl;
 		return (1);
 	}
-	
+	if (ft_check_map_equal(equal_map) == false)
+	{
+		std::cerr << "Error equal format" << std::endl;
+		return (1);
+	}
+
+	ft_create_reduced_form(equation_map, equal_map);
+	std::cout << "Reduced form: ";
 	ft_print_map(equation_map);
-	std::cout << "------------" << std::endl;
-	ft_print_map(equal_map);
+	std::cout << "= 0" << std::endl;
+
+	std::cout << "Polynomial degree: ";
+	std::cout << prev(equation_map.end())->first << std::endl;
+	if (prev(equation_map.end())->first > 2)
+	{
+		std::cout << "The polynomial degree is strictly greater than 2, I can't solve" << std::endl;
+		return (0);
+	}
+	else if (equation_map.size() == 3)
+		ft_solve_second(equation_map);
+	else if (equation_map.size() == 2)
+
+		
 	return (0);
 }
