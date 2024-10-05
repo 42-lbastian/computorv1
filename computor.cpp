@@ -4,11 +4,11 @@
 #include <map>
 #include <math.h>
 
-bool ft_check_map_equal(std::map<int, float>& numbers)
+bool ft_check_map_equal(std::map<int, float>& numbers, int max)
 {
 	if (numbers.size() == 0)
 		numbers[0] = 0.0;
-	else if (numbers.size() > 1 || numbers.begin()->first != 0)
+	else if (numbers.size() > 1 || numbers.begin()->first > max)
 		return (false);
 	return (true);
 }
@@ -118,7 +118,7 @@ bool ft_create_equation_strings(char *input, std::string& equation, std::string&
 
 void ft_create_reduced_form(std::map<int, float>& equation_map, std::map<int, float>& equal_map)
 {
-	equation_map.begin()->second += (equal_map.begin()->second * -1);
+	equation_map.at(equal_map.begin()->first) += (equal_map.begin()->second * -1);
 	equal_map.begin()->second = 0.0;
 }
 
@@ -198,7 +198,7 @@ int main(int argc, char **argv)
 		std::cerr << "Error exponent equation" << std::endl;
 		return (1);
 	}
-	if (ft_check_map_equal(equal_map) == false)
+	if (ft_check_map_equal(equal_map, equation_map.size() - 1) == false)
 	{
 		std::cerr << "Error equal format" << std::endl;
 		return (1);
