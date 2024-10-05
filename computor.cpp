@@ -72,7 +72,14 @@ bool ft_parse(std::map<int, float>& map, std::string str)
 		index = atoi(&str[i + j]);
 		if (map.find(index) != map.end())
 			return (false);
-		map[index] = std::stof(temp);
+		try
+		{
+			map[index] = std::stof(temp);
+		}
+		catch (std::invalid_argument& error)
+		{
+			return (false);
+		}
 		if (str[i + j + 1])
 			j++;
 		while (str[i + j] && str[i + j] == ' ')
@@ -144,6 +151,26 @@ void ft_solve_second(std::map<int, float> equation_map)
 	}
 }
 
+void ft_solve_one(std::map<int, float> equation_map)
+{
+	double solution;
+	float a;
+	float b;
+
+	a = equation_map.at(1);
+	b = equation_map.at(0);
+	solution = (b * -1) / a;
+	std::cout << "Solution: " << solution << std::endl;
+}
+
+void ft_solve_zero(std::map<int, float> equation_map)
+{
+	if (equation_map.at(0) == 0)
+		std::cout << "True" << std::endl;
+	else
+		std::cout << "False" << std::endl;
+}
+
 int main(int argc, char **argv)
 {
 	std::map<int, float> equation_map;
@@ -159,7 +186,7 @@ int main(int argc, char **argv)
 	if (ft_create_equation_strings(argv[1], equation_str, equal_str) == false)
 	{
 		std::cerr << "Error equal" << std::endl;
-		return (1);	
+		return (1);
 	}
 	if (ft_parse(equation_map, equation_str) == false || ft_parse(equal_map, equal_str) == false)
 	{
@@ -192,7 +219,8 @@ int main(int argc, char **argv)
 	else if (equation_map.size() == 3)
 		ft_solve_second(equation_map);
 	else if (equation_map.size() == 2)
-
-		
+		ft_solve_one(equation_map);
+	else
+		ft_solve_zero(equation_map);
 	return (0);
 }
