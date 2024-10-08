@@ -135,6 +135,11 @@ void ft_solve_second(std::map<int, float> equation_map)
 	b = equation_map.at(1);
 	c = equation_map.at(0);
 	delta = (b * b) - 4 * a * c;
+	if (a == 0)
+	{
+		std::cout << "Not divisible by 0" << std::endl;
+		return ;
+	}
 	if (delta > 0)
 	{
 		solution1 = ((b * -1) - sqrt(delta)) / (2 * a);
@@ -169,6 +174,18 @@ void ft_solve_zero(std::map<int, float> equation_map)
 		std::cout << "True" << std::endl;
 	else
 		std::cout << "False" << std::endl;
+}
+
+bool ft_check_empty(std::map<int, float> equation_map)
+{
+	std::map<int, float>::iterator it = equation_map.begin();
+	it++;
+	for (; it != equation_map.end(); it++)
+	{
+		if (it->second != 0)
+			return (false);
+	}
+	return (true);
 }
 
 int main(int argc, char **argv)
@@ -216,11 +233,12 @@ int main(int argc, char **argv)
 		std::cout << "The polynomial degree is strictly greater than 2, I can't solve" << std::endl;
 		return (0);
 	}
-	else if (equation_map.size() == 3)
-		ft_solve_second(equation_map);
+	else if (equation_map.size() == 1 || ft_check_empty(equation_map))
+		ft_solve_zero(equation_map);
 	else if (equation_map.size() == 2)
 		ft_solve_one(equation_map);
+	else if (equation_map.size() == 3)
+		ft_solve_second(equation_map);
 	else
-		ft_solve_zero(equation_map);
 	return (0);
 }
