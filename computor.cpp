@@ -144,14 +144,19 @@ void ft_solve_second(std::map<int, float> equation_map)
 	{
 		solution1 = ((b * -1) - sqrt(delta)) / (2 * a);
 		solution2 = ((b * -1) + sqrt(delta)) / (2 * a);
+		std::cout << "Delta is strictly positive" << std::endl;
 		std::cout << "Solution 1: " << solution1 << std::endl;
 		std::cout << "Solution 2: " << solution2 << std::endl;
 	}
 	else if (delta < 0)
+	{
+		std::cout << "Delta is negativ" << std::endl;
 		std::cout << "No solutions" << std::endl;
+	}
 	else
 	{
 		solution1 = (b * -1) / (2 * a);
+		std::cout << "Delta is nul" << std::endl;
 		std::cout << "Solution: " << solution1 << std::endl;
 	}
 }
