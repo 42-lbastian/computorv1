@@ -2,13 +2,41 @@
 #include <string>
 #include <cstring>
 #include <map>
-#include <math.h>
+#include <float.h>
+
+double ft_fabs(double number)
+{
+	if (number < 0.0)
+		return (-number);
+	else
+		return (number);
+}
+
+bool ft_sqrt_double(double number, double& result)
+{
+    double prev_result;
+    
+    if (number == 0.0)
+    {
+        result = 0.0;
+        return true;
+    }
+    result = number / 4.0;
+    do
+    {
+        prev_result = result;
+        result = (result + number / result) / 2.0;
+    }
+    while (ft_fabs(result - prev_result) > 0.00001 * result);
+    return true;
+}
+
 
 bool ft_check_map_equal(std::map<int, float>& numbers, int max)
 {
 	if (numbers.size() == 0)
 		numbers[0] = 0.0;
-	else if (numbers.size() > 1 || numbers.begin()->first > max)
+	else if (prev(numbers.end())->first > max)
 		return (false);
 	return (true);
 }
@@ -76,7 +104,7 @@ bool ft_parse(std::map<int, float>& map, std::string str)
 		{
 			map[index] = std::stof(temp);
 		}
-		catch (std::invalid_argument& error)
+		catch (std::exception& error)
 		{
 			return (false);
 		}
@@ -118,15 +146,21 @@ bool ft_create_equation_strings(char *input, std::string& equation, std::string&
 
 void ft_create_reduced_form(std::map<int, float>& equation_map, std::map<int, float>& equal_map)
 {
-	equation_map.at(equal_map.begin()->first) += (equal_map.begin()->second * -1);
-	equal_map.begin()->second = 0.0;
+	for (std::map<int, float>::iterator it = equal_map.begin(); it != equal_map.end(); it++)
+	{
+		equation_map.at(it->first) += (it->second * -1);
+		it->second = 0.0;
+		if (it->first == 2 && equation_map.at(2) == 0)
+			equation_map.erase(2);
+	}
 }
 
-void ft_solve_second(std::map<int, float> equation_map)
+bool ft_solve_second(std::map<int, float> equation_map)
 {
 	double delta;
 	double solution1;
 	double solution2;
+	double sqrt_delta;
 	float a;
 	float b;
 	float c;
@@ -135,23 +169,23 @@ void ft_solve_second(std::map<int, float> equation_map)
 	b = equation_map.at(1);
 	c = equation_map.at(0);
 	delta = (b * b) - 4 * a * c;
-	if (a == 0)
-	{
-		std::cout << "Not divisible by 0" << std::endl;
-		return ;
-	}
 	if (delta > 0)
 	{
-		solution1 = ((b * -1) - sqrt(delta)) / (2 * a);
-		solution2 = ((b * -1) + sqrt(delta)) / (2 * a);
+		if (ft_sqrt_double(delta, sqrt_delta) == false)
+			return (false);
+		solution1 = ((b * -1) - sqrt_delta) / (2 * a);
+		solution2 = ((b * -1) + sqrt_delta) / (2 * a);
 		std::cout << "Delta is strictly positive" << std::endl;
 		std::cout << "Solution 1: " << solution1 << std::endl;
 		std::cout << "Solution 2: " << solution2 << std::endl;
 	}
 	else if (delta < 0)
 	{
+		if (ft_sqrt_double(-delta, sqrt_delta) == false)
+			return (false);
 		std::cout << "Delta is negativ" << std::endl;
-		std::cout << "No solutions" << std::endl;
+		std::cout << "Solution 1: " << -b/(2 * a) << " - " << sqrt_delta / (2 * a) << "i" << std::endl;
+		std::cout << "Solution 2: " << -b/(2 * a) << " + " << sqrt_delta / (2 * a) << "i" << std::endl;
 	}
 	else
 	{
@@ -159,6 +193,7 @@ void ft_solve_second(std::map<int, float> equation_map)
 		std::cout << "Delta is nul" << std::endl;
 		std::cout << "Solution: " << solution1 << std::endl;
 	}
+	return (true);
 }
 
 void ft_solve_one(std::map<int, float> equation_map)
@@ -243,7 +278,9 @@ int main(int argc, char **argv)
 	else if (equation_map.size() == 2)
 		ft_solve_one(equation_map);
 	else if (equation_map.size() == 3)
-		ft_solve_second(equation_map);
-	else
+	{
+		if (ft_solve_second(equation_map) == false)
+			std::cout << "Error calculation" << std::endl;
+	}
 	return (0);
 }
