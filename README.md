@@ -1,4 +1,4 @@
-<h1 align="center"> push_swap </h1>
+<h1 align="center"> computorv1 </h1>
 <h4 align="center"> "I’m not a graduate either" </h4>
 
 ---
